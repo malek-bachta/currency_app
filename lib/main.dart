@@ -1,6 +1,5 @@
 
 import 'package:currecy_App/porviders/DataClass.dart';
-import 'package:currecy_App/screens/Initial_screen.dart';
 import 'package:currecy_App/screens/Splash_Screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

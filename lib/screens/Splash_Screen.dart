@@ -23,13 +23,11 @@ class _SplashScreenState extends State<SplashScreen>
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
-    // Initialize animation controller
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
     );
 
-    // Initialize fade animation
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
