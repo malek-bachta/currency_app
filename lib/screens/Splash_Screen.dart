@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:currecy_App/screens/Home_screen.dart';
 import 'package:currecy_App/screens/Initial_screen.dart';
+import 'package:currecy_App/screens/helpers/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -39,11 +40,13 @@ class _SplashScreenState extends State<SplashScreen>
       _animationController.forward();
     });
 
-    _animationController.addStatusListener((status) {
+    _animationController.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
+        bool hasSavedData = await SharedPreferencesHelper.hasSavedData();
+        print('Has saved data: $hasSavedData');
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => const HomeScreen(),
+            builder: (_) => hasSavedData ? HomeScreen() : InitialScreen(),
           ),
         );
       }

@@ -1,10 +1,10 @@
-import 'package:currecy_App/models/conversion_model.dart';
-import 'package:currecy_App/screens/Archive_screen.dart';
+import 'package:currecy_App/models/Conversion.dart';
 import 'package:currecy_App/screens/popups/Settings_popup.dart';
+import 'package:currecy_App/screens/helpers/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -13,6 +13,37 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   static Conversion staticConversion =
       Conversion(inputAmount: "1.0", from: 'USD', to: 'EUR', result: "0.85");
+
+  late TextEditingController inputAmountController;
+  late TextEditingController fromCurrencyController;
+  late TextEditingController toCurrencyController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize controllers and load saved data
+    inputAmountController = TextEditingController();
+    fromCurrencyController = TextEditingController();
+    toCurrencyController = TextEditingController();
+
+    loadSavedData();
+  }
+
+  void loadSavedData() async {
+    // Retrieve saved data from SharedPreferences
+    final Map<String, String> conversionPreferences =
+        await SharedPreferencesHelper.getConversionPreferences();
+    final String? inputAmount =
+        await SharedPreferencesHelper.getInputAmount();
+
+    // Update UI with saved data
+    setState(() {
+      inputAmountController.text = inputAmount ?? '';
+      fromCurrencyController.text = conversionPreferences['fromCurrency'] ?? '';
+      toCurrencyController.text = conversionPreferences['toCurrency'] ?? '';
+    });
+  }
 
   void _showSettingsPopup(BuildContext context) {
     showDialog(
@@ -51,13 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white,
             ),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ArchiveScreen(conversions: [staticConversion]),
-                ),
-              );
+              // Navigate to ArchiveScreen
             },
           ),
           IconButton(
@@ -77,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
+              controller: inputAmountController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Input Amount',
@@ -93,6 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Expanded(
                   child: TextField(
+                    controller: fromCurrencyController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'From',
@@ -116,6 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Expanded(
                   child: TextField(
+                    controller: toCurrencyController,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'To',

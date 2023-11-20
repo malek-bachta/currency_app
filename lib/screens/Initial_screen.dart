@@ -1,7 +1,25 @@
+import 'package:currecy_App/models/Currency.dart';
+import 'package:currecy_App/porviders/DataClass.dart';
+import 'package:currecy_App/screens/helpers/shared_preferences_helper.dart';
+import 'package:currecy_App/screens/widgets/custom_dropdown.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class InitialScreen extends StatelessWidget {
+class InitialScreen extends StatefulWidget {
   const InitialScreen({Key? key});
+
+  @override
+  _InitialScreenState createState() => _InitialScreenState();
+}
+
+class _InitialScreenState extends State<InitialScreen> {
+  TextEditingController usernameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<DataClass>(context, listen: false).fetchCurrencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +34,7 @@ class InitialScreen extends StatelessWidget {
               height: 190.0,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFECF0F1), // Light Gray
+                color: const Color(0xFFECF0F1),
               ),
               child: Center(
                 child: Image.asset(
@@ -28,59 +46,88 @@ class InitialScreen extends StatelessWidget {
             ),
             SizedBox(height: 20.0),
             TextField(
+              controller: usernameController,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Username',
-                fillColor: const Color(0xFFECF0F1), // Light Gray
+                fillColor: const Color(0xFFECF0F1),
                 filled: true,
               ),
-              // Handle text input 1 changes
             ),
             SizedBox(height: 20.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'From',
-                      fillColor: const Color(0xFFECF0F1), // Light Gray
-                      filled: true,
+            Consumer<DataClass>(
+              builder: (context, dataClass, child) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: CustomDropdown(
+                        currencies: dataClass.currencies,
+                        selectedCurrency: dataClass.selectedFromCurrency,
+                        onChanged: (Currency? newValue) {
+                          dataClass.selectedFromCurrency = newValue!;
+                          print('Selected From Currency: ${newValue?.name}');
+                        },
+                        LabelText: 'From',
+                      ),
                     ),
-                    // Handle text input 1 changes
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.swap_horiz,
-                    color: const Color(0xFF2C3E50), // Dark Blue Gray
-                  ),
-                  onPressed: () {
-                    // Add logic for swapping 'From' and 'To'
-                  },
-                ),
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'To',
-                      fillColor: const Color(0xFFECF0F1), // Light Gray
-                      filled: true,
+                    IconButton(
+                      icon: const Icon(
+                        Icons.swap_horiz,
+                        color: const Color(0xFF2C3E50),
+                      ),
+                      onPressed: () {
+                        dataClass.swapCurrencies();
+                      },
                     ),
-                    // Handle text input 2 changes
-                  ),
-                ),
-              ],
+                    Expanded(
+                      child: CustomDropdown(
+                        currencies: dataClass.currencies,
+                        selectedCurrency: dataClass.selectedToCurrency,
+                        onChanged: (Currency? newValue) {
+                          dataClass.selectedToCurrency = newValue!;
+                          print('Selected To Currency: ${newValue?.name}');
+                        },
+                        LabelText: 'To',
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: () {
-                // Add logic for currency conversion
+              onPressed: () async {
+                final String enteredUsername = usernameController.text;
+                await SharedPreferencesHelper.saveUsername(enteredUsername);
+                print('Entered Username: $enteredUsername');
+
+                final String? username =
+                    await SharedPreferencesHelper.getUsername();
+                print('Username: $username');
+
+                // Save default conversion
+                final DataClass dataClass =
+                    Provider.of<DataClass>(context, listen: false);
+                SharedPreferencesHelper.saveConversionPreferences(
+                  dataClass.selectedFromCurrency?.code ?? 'USD',
+                  dataClass.selectedToCurrency?.code ?? 'EUR',
+                );
+
+                final Map<String, String> conversionPreferences =
+                    await SharedPreferencesHelper.getConversionPreferences();
+                print(
+                    'From Currency: ${conversionPreferences['fromCurrency']}');
+                print('To Currency: ${conversionPreferences['toCurrency']}');
               },
-              child: Text('Save'),
+              child: Text(
+                'Save',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
-                primary: const Color(0xFF3498DB), // Dodger Blue
+                primary: const Color(0xFF3498DB),
               ),
             ),
           ],

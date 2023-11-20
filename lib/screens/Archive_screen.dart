@@ -1,4 +1,4 @@
-import 'package:currecy_App/models/conversion_model.dart';
+import 'package:currecy_App/models/Conversion.dart';
 import 'package:flutter/material.dart';
 
 class ArchiveScreen extends StatelessWidget {
