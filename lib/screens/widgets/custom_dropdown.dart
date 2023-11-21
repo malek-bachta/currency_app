@@ -29,13 +29,11 @@ class CustomDropdown extends StatelessWidget {
           onChanged: (value) {
             final selected = currencies.firstWhere(
               (currency) => currency.code.toLowerCase() == value.toLowerCase(),
-              orElse: () =>
-                  currencies.first, 
+              orElse: () => currencies.first,
             );
             onChanged(selected);
           },
         ),
-        
       ],
     );
   }

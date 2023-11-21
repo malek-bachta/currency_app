@@ -1,4 +1,5 @@
 import 'package:currecy_App/models/Conversion.dart';
+import 'package:currecy_App/screens/Archive_screen.dart';
 import 'package:currecy_App/screens/popups/Settings_popup.dart';
 import 'package:currecy_App/screens/helpers/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    // Initialize controllers and load saved data
     inputAmountController = TextEditingController();
     fromCurrencyController = TextEditingController();
     toCurrencyController = TextEditingController();
@@ -34,10 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // Retrieve saved data from SharedPreferences
     final Map<String, String> conversionPreferences =
         await SharedPreferencesHelper.getConversionPreferences();
-    final String? inputAmount =
-        await SharedPreferencesHelper.getInputAmount();
+    final String? inputAmount = await SharedPreferencesHelper.getInputAmount();
 
-    // Update UI with saved data
     setState(() {
       inputAmountController.text = inputAmount ?? '';
       fromCurrencyController.text = conversionPreferences['fromCurrency'] ?? '';
@@ -49,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return SettingsPopup(); // Use the SettingsPopup widget
+        return SettingsPopup();
       },
     );
   }
@@ -81,8 +79,16 @@ class _HomeScreenState extends State<HomeScreen> {
               Icons.archive,
               color: Colors.white,
             ),
-            onPressed: () {
-              // Navigate to ArchiveScreen
+             onPressed: () {
+              // Navigate to ArchiveScreen with the list of conversions
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ArchiveScreen(
+                    conversions: [staticConversion], // Add your list of conversions here
+                  ),
+                ),
+              );
             },
           ),
           IconButton(
@@ -101,18 +107,20 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TextField(
-              controller: inputAmountController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Input Amount',
-                fillColor: const Color(0xFFECF0F1),
-                filled: true,
-                labelStyle: TextStyle(
-                  color: const Color(0xFF2C3E50),
+            Container(
+              width: 190.0,
+              height: 190.0,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFFECF0F1),
+              ),
+              child: Center(
+                child: Image.asset(
+                  'assets/images/currencylogo.png',
+                  width: 160.0,
+                  height: 160.0,
                 ),
               ),
-              // Handle text input 1 changes
             ),
             SizedBox(height: 20.0),
             Row(
@@ -129,7 +137,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: const Color(0xFF2C3E50),
                       ),
                     ),
-                    // Handle text input 1 changes
                   ),
                 ),
                 IconButton(
@@ -153,13 +160,24 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: const Color(0xFF2C3E50),
                       ),
                     ),
-                    // Handle text input 2 changes
                   ),
                 ),
               ],
             ),
             SizedBox(height: 20.0),
-            // Use RichText for a more professional look
+            TextField(
+              controller: inputAmountController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Input Amount',
+                fillColor: const Color(0xFFECF0F1),
+                filled: true,
+                labelStyle: TextStyle(
+                  color: const Color(0xFF2C3E50),
+                ),
+              ),
+            ),
+            SizedBox(height: 20.0),
             RichText(
               text: TextSpan(
                 text: 'Result: ',
