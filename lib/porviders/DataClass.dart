@@ -13,7 +13,7 @@ class DataClass extends ChangeNotifier {
   Future<void> fetchCurrencies() async {
     print('Fetching currencies...');
     final url =
-        'https://api.fastforex.io/currencies?api_key=64a8daed52-e5b867dad2-s4br2p';
+        'https://api.fastforex.io/currencies?api_key=38e8071029-c818e7a246-s502e0';
 
     try {
       final response =
@@ -66,18 +66,5 @@ class DataClass extends ChangeNotifier {
     selectedToCurrency = temp;
 
     notifyListeners();
-  }
-
-  Future<void> testSimpleRequest() async {
-    final url = 'https://www.example.com';
-
-    try {
-      final response =
-          await http.get(Uri.parse(url)).timeout(Duration(seconds: 20));
-      print('Response status code: ${response.statusCode}');
-      print('Raw response body: ${response.body}');
-    } catch (e) {
-      print('Error in testSimpleRequest: $e');
-    }
   }
 }
