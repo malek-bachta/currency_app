@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:currecy_App/screens/Home_screen.dart';
 import 'package:currecy_App/screens/Initial_screen.dart';
-import 'package:currecy_App/screens/helpers/shared_preferences_helper.dart';
+import 'package:currecy_App/helpers/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

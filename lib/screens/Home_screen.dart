@@ -1,7 +1,7 @@
 import 'package:currecy_App/models/Conversion.dart';
 import 'package:currecy_App/screens/Archive_screen.dart';
 import 'package:currecy_App/screens/popups/Settings_popup.dart';
-import 'package:currecy_App/screens/helpers/shared_preferences_helper.dart';
+import 'package:currecy_App/helpers/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -80,7 +80,6 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white,
             ),
              onPressed: () {
-              // Navigate to ArchiveScreen with the list of conversions
               Navigator.push(
                 context,
                 MaterialPageRoute(

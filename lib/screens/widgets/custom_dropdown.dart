@@ -1,4 +1,3 @@
-// custom_dropdown.dart
 import 'package:currecy_App/models/Currency.dart';
 import 'package:flutter/material.dart';
 
@@ -6,13 +5,13 @@ class CustomDropdown extends StatelessWidget {
   final List<Currency> currencies;
   final Currency? selectedCurrency;
   final ValueChanged<Currency?> onChanged;
-  final String LabelText;
+  final String labelText;
 
   CustomDropdown({
     required this.currencies,
     required this.selectedCurrency,
     required this.onChanged,
-    required this.LabelText,
+    required this.labelText,
   });
 
   @override
@@ -20,18 +19,26 @@ class CustomDropdown extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        TextField(
-          controller: TextEditingController(text: selectedCurrency?.code),
+        DropdownButtonFormField<Currency>(
           decoration: InputDecoration(
             border: OutlineInputBorder(),
-            labelText: LabelText,
+            labelText: labelText,
+            fillColor: const Color(0xFFECF0F1),
+            filled: true,
           ),
-          onChanged: (value) {
-            final selected = currencies.firstWhere(
-              (currency) => currency.code.toLowerCase() == value.toLowerCase(),
-              orElse: () => currencies.first,
+          value: selectedCurrency,
+          onChanged: onChanged,
+          items:
+              currencies.map<DropdownMenuItem<Currency>>((Currency currency) {
+            return DropdownMenuItem<Currency>(
+              value: currency,
+              child: Text("${currency.name} (${currency.code})"),
             );
-            onChanged(selected);
+          }).toList(),
+          selectedItemBuilder: (BuildContext context) {
+            return currencies.map<Widget>((Currency currency) {
+              return Text(currency.code);
+            }).toList();
           },
         ),
       ],

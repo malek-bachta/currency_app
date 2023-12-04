@@ -1,10 +1,10 @@
 import 'package:currecy_App/models/Currency.dart';
 import 'package:currecy_App/porviders/DataClass.dart';
-import 'package:currecy_App/screens/helpers/shared_preferences_helper.dart';
+import 'package:currecy_App/helpers/shared_preferences_helper.dart';
 import 'package:currecy_App/screens/widgets/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:currecy_App/screens/Home_screen.dart'; // Import the HomeScreen
+import 'package:currecy_App/screens/Home_screen.dart'; 
 
 class InitialScreen extends StatefulWidget {
   const InitialScreen({Key? key});
@@ -69,7 +69,7 @@ class _InitialScreenState extends State<InitialScreen> {
                           dataClass.selectedFromCurrency = newValue!;
                           print('Selected From Currency: ${newValue?.name}');
                         },
-                        LabelText: 'From',
+                        labelText: 'From',
                       ),
                     ),
                     IconButton(
@@ -89,7 +89,7 @@ class _InitialScreenState extends State<InitialScreen> {
                           dataClass.selectedToCurrency = newValue!;
                           print('Selected To Currency: ${newValue?.name}');
                         },
-                        LabelText: 'To',
+                        labelText: 'To',
                       ),
                     ),
                   ],
@@ -100,34 +100,52 @@ class _InitialScreenState extends State<InitialScreen> {
             ElevatedButton(
               onPressed: () async {
                 final String enteredUsername = usernameController.text;
-                await SharedPreferencesHelper.saveUsername(enteredUsername);
-                print('Entered Username: $enteredUsername');
-
-                final String? username =
-                    await SharedPreferencesHelper.getUsername();
-                print('Username: $username');
-
-                // Save default conversion
                 final DataClass dataClass =
                     Provider.of<DataClass>(context, listen: false);
-                SharedPreferencesHelper.saveConversionPreferences(
-                  dataClass.selectedFromCurrency?.code ?? 'USD',
-                  dataClass.selectedToCurrency?.code ?? 'EUR',
-                );
 
-                final Map<String, String> conversionPreferences =
-                    await SharedPreferencesHelper.getConversionPreferences();
-                print(
-                    'From Currency: ${conversionPreferences['fromCurrency']}');
-                print('To Currency: ${conversionPreferences['toCurrency']}');
+                if (enteredUsername.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Please enter a username"),
+                    ),
+                  );
+                } else if (dataClass.selectedFromCurrency?.code ==
+                    dataClass.selectedToCurrency?.code) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Please select different currencies"),
+                    ),
+                  );
+                } else {
+                  final String enteredUsername = usernameController.text;
+                  await SharedPreferencesHelper.saveUsername(enteredUsername);
+                  print('Entered Username: $enteredUsername');
 
-                // Navigate to HomeScreen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HomeScreen(),
-                  ),
-                );
+                  final String? username =
+                      await SharedPreferencesHelper.getUsername();
+                  print('Username: $username');
+
+                  // Save default conversion
+                  final DataClass dataClass =
+                      Provider.of<DataClass>(context, listen: false);
+                  SharedPreferencesHelper.saveConversionPreferences(
+                    dataClass.selectedFromCurrency?.code ?? 'USD',
+                    dataClass.selectedToCurrency?.code ?? 'EUR',
+                  );
+
+                  final Map<String, String> conversionPreferences =
+                      await SharedPreferencesHelper.getConversionPreferences();
+                  print(
+                      'From Currency: ${conversionPreferences['fromCurrency']}');
+                  print('To Currency: ${conversionPreferences['toCurrency']}');
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HomeScreen(),
+                    ),
+                  );
+                }
               },
               child: Text(
                 'Save',
