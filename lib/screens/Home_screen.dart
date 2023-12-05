@@ -13,9 +13,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static Conversion staticConversion =
-      Conversion(inputAmount: "1.0", from: 'USD', to: 'EUR', result: "0.85");
-
   late TextEditingController inputAmountController;
   late TextEditingController fromCurrencyController;
   late TextEditingController toCurrencyController;
@@ -69,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void performConversion() async {
     String fromCurrency = fromCurrencyController.text.toUpperCase();
     String toCurrency = toCurrencyController.text.toUpperCase();
+    String inputAmount = inputAmountController.text;
 
     double amount = double.tryParse(inputAmountController.text) ?? 0.0;
 
@@ -83,6 +81,17 @@ class _HomeScreenState extends State<HomeScreen> {
       fromCurrencyController.text = fromCurrency;
       toCurrencyController.text = toCurrency;
     });
+
+    if (result != null) {
+      Conversion newConversion = Conversion(
+        from: fromCurrency,
+        to: toCurrency,
+        inputAmount: inputAmount.toString(),
+        result: result.toString(),
+        dateTime: DateTime.now(),
+      );
+      await SharedPreferencesHelper.saveConversionRecord(newConversion);
+    }
   }
 
   Future<void> _refreshData() async {
@@ -124,16 +133,17 @@ class _HomeScreenState extends State<HomeScreen> {
               Icons.archive,
               color: Colors.white,
             ),
-            onPressed: () {
+            onPressed: () async {
+              // Fetching conversion records from shared preferences
+              List<Conversion> conversions =
+                  await SharedPreferencesHelper.getConversionRecords();
+
+              // Navigating to the ArchiveScreen with the fetched conversions
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ArchiveScreen(
-                    conversions: [
-                      staticConversion
-                    ], // Add your list of conversions here
-                  ),
-                ),
+                    builder: (context) =>
+                        ArchiveScreen(conversions: conversions)),
               );
             },
           ),
@@ -275,21 +285,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 SizedBox(height: 20.0),
-                RichText(
-                  text: TextSpan(
-                    text: 'Result: ',
-                    style: TextStyle(
-                      color: const Color(0xFF2C3E50),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Container(
+                  padding: EdgeInsets.all(15.0),
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 232, 245, 233),
+                    borderRadius: BorderRadius.circular(10),
+                    border:
+                        Border.all(color: Color.fromARGB(255, 200, 230, 201)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      TextSpan(
-                        text: '$conversionResult',
+                      Icon(Icons.compare_arrows,
+                          color: Color.fromARGB(255, 11, 197, 36)),
+                      SizedBox(width: 10),
+                      Text(
+                        'Result: $conversionResult',
                         style: TextStyle(
-                          color: const Color(0xFF3498DB),
+                          color: Color.fromARGB(255, 30, 42, 42),
                           fontSize: 18.0,
-                          fontWeight: FontWeight.normal,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
@@ -300,8 +315,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      onPressed: () {
-                        // Add logic for currency conversion
+                      onPressed: () async {
+                        List<Conversion> conversions =
+                            await SharedPreferencesHelper
+                                .getConversionRecords();
                       },
                       child: Text(
                         'Save',

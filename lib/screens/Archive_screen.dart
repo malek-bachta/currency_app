@@ -1,19 +1,62 @@
-import 'package:currecy_App/models/Conversion.dart';
+import 'package:currecy_App/helpers/shared_preferences_helper.dart';
+import 'package:currecy_App/screens/popups/delete_confirmation.dart';
+import 'package:currecy_App/screens/widgets/ConversionTile.dart';
 import 'package:flutter/material.dart';
+import 'package:currecy_App/models/Conversion.dart';
 
-class ArchiveScreen extends StatelessWidget {
+class ArchiveScreen extends StatefulWidget {
   final List<Conversion> conversions;
 
-  const ArchiveScreen({Key? key, required this.conversions}) : super(key: key);
+  ArchiveScreen({Key? key, required this.conversions}) : super(key: key);
+
+  @override
+  _ArchiveScreenState createState() => _ArchiveScreenState();
+}
+
+class _ArchiveScreenState extends State<ArchiveScreen> {
+  List<Conversion> conversions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadConversions();
+  }
+
+  void _loadConversions() async {
+    var loadedConversions =
+        await SharedPreferencesHelper.getConversionRecords();
+    setState(() {
+      conversions = loadedConversions;
+    });
+  }
+
+  void _handleDelete(int index) async {
+    await SharedPreferencesHelper.deleteConversionRecord(index);
+    _loadConversions(); // Refresh the list after deletion
+  }
+
+  void _showDeleteConfirmation(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DeleteConfirmation(
+          onConfirmDelete: () => _confirmDelete(index),
+        );
+      },
+    );
+  }
+
+  void _confirmDelete(int index) async {
+    await SharedPreferencesHelper.deleteConversionRecord(index);
+    _loadConversions(); // Refresh the list after deletion
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF2C3E50),
-        iconTheme: IconThemeData(
-            color: Colors.white), 
-
+        iconTheme: IconThemeData(color: Colors.white),
         title: Row(
           children: [
             Image.asset(
@@ -31,27 +74,14 @@ class ArchiveScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Display the list of conversions
-            for (var conversion in conversions)
-              _buildConversionTile(conversion),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildConversionTile(Conversion conversion) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 10.0),
-      child: ListTile(
-        title: Text('From: ${conversion.from} To: ${conversion.to}'),
-        subtitle: Text(
-            'Input: ${conversion.inputAmount} Result: ${conversion.result}'),
+      body: ListView.builder(
+        itemCount: conversions.length,
+        itemBuilder: (context, index) {
+          return ConversionTile(
+            conversion: conversions[index],
+            onDelete: () => _showDeleteConfirmation(context, index),
+          );
+        },
       ),
     );
   }

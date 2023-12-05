@@ -42,6 +42,25 @@ class _SettingsPopupState extends State<SettingsPopup> {
     });
   }
 
+  void _UpdateData() async {
+    // Retrieve values from the text controllers
+    String inputUsername = inputUsernameController.text;
+    String fromCurrency = fromCurrencyController.text.toUpperCase();
+    String toCurrency = toCurrencyController.text.toUpperCase();
+
+    // Validate and save the inputUsername
+    if (inputUsername.isNotEmpty) {
+      await SharedPreferencesHelper.saveUsername(inputUsername);
+    }
+
+    // Save the conversion preferences
+    await SharedPreferencesHelper.saveConversionPreferences(
+        fromCurrency, toCurrency);
+
+    // Close the settings popup
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -57,20 +76,6 @@ class _SettingsPopupState extends State<SettingsPopup> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.close,
-                      color: const Color(0xFF2C3E50),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
               TextField(
                 controller: inputUsernameController,
                 decoration: InputDecoration(
@@ -127,37 +132,25 @@ class _SettingsPopupState extends State<SettingsPopup> {
                   ),
                 ],
               ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () async {
-                  // Retrieve values from the text controllers
-                  String inputUsername = inputUsernameController.text;
-                  String fromCurrency =
-                      fromCurrencyController.text.toUpperCase();
-                  String toCurrency = toCurrencyController.text.toUpperCase();
-
-                  // Validate and save the inputUsername
-                  if (inputUsername.isNotEmpty) {
-                    await SharedPreferencesHelper.saveUsername(inputUsername);
-                  }
-
-                  // Save the conversion preferences
-                  await SharedPreferencesHelper.saveConversionPreferences(
-                      fromCurrency, toCurrency);
-
-                  // Close the settings popup
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'Save',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(
+                      child: Text("Cancel"),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    TextButton(
+                      child: Text("Save", style: TextStyle(color: Colors.red)),
+                      onPressed: () {
+                        // Retrieve values from the text controllers
+                        _UpdateData();
+                      },
+                    ),
+                  ],
                 ),
-                style: ElevatedButton.styleFrom(
-                  primary: const Color(0xFF3498DB),
-                ),
-              )
+              ),
             ],
           ),
         ),

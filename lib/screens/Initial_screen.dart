@@ -4,7 +4,7 @@ import 'package:currecy_App/helpers/shared_preferences_helper.dart';
 import 'package:currecy_App/screens/widgets/custom_dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:currecy_App/screens/Home_screen.dart'; 
+import 'package:currecy_App/screens/Home_screen.dart';
 
 class InitialScreen extends StatefulWidget {
   const InitialScreen({Key? key});

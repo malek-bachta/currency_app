@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:currecy_App/models/Conversion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {
@@ -79,4 +82,51 @@ class SharedPreferencesHelper {
       return false;
     }
   }
+
+
+   static const String _conversionRecordsKey = 'conversionRecords';
+
+    static Future<void> saveConversionRecord(Conversion conversion) async {
+        try {
+            final SharedPreferences prefs = await SharedPreferences.getInstance();
+            List<Conversion> conversions = await getConversionRecords();
+            conversions.add(conversion);
+            List<String> conversionStrings = conversions.map((c) => json.encode(c.toJson())).toList();
+            await prefs.setStringList(_conversionRecordsKey, conversionStrings);
+        } catch (e) {
+            print('Error saving conversion record: $e');
+        }
+    }
+
+    static Future<List<Conversion>> getConversionRecords() async {
+        try {
+            final SharedPreferences prefs = await SharedPreferences.getInstance();
+            List<String> conversionStrings = prefs.getStringList(_conversionRecordsKey) ?? [];
+            return conversionStrings.map((string) => Conversion.fromJson(json.decode(string))).toList();
+        } catch (e) {
+            print('Error retrieving conversion records: $e');
+            return [];
+        }
+    }
+
+     static Future<void> saveConversionList(List<Conversion> conversions) async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      List<String> conversionStrings = conversions.map((c) => json.encode(c.toJson())).toList();
+      await prefs.setStringList(_conversionRecordsKey, conversionStrings);
+    } catch (e) {
+      print('Error saving conversion list: $e');
+    }
+  }
+
+  static Future<void> deleteConversionRecord(int index) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> storedConversions = prefs.getStringList(_conversionRecordsKey) ?? [];
+    if (index < storedConversions.length) {
+      storedConversions.removeAt(index);
+      await prefs.setStringList(_conversionRecordsKey, storedConversions);
+    }
+  }
+
+    
 }
