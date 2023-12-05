@@ -11,7 +11,6 @@ class DataClass extends ChangeNotifier {
   Currency? selectedToCurrency;
 
   Future<void> fetchCurrencies() async {
-    print('Fetching currencies...');
     final url =
         'https://api.fastforex.io/currencies?api_key=38e8071029-c818e7a246-s502e0';
 
@@ -58,6 +57,41 @@ class DataClass extends ChangeNotifier {
 
     print('Currencies after fetch: $currencies');
     notifyListeners();
+  }
+
+  Future<double?> convertCurrency(
+      String fromCurrency, String toCurrency, double amount) async {
+    // Validation checks
+    if (fromCurrency.isEmpty || toCurrency.isEmpty || amount <= 0) {
+      print('Invalid input for conversion');
+      return null;
+    }
+
+    final url =
+        'https://api.fastforex.io/convert?from=$fromCurrency&to=$toCurrency&amount=$amount&api_key=38e8071029-c818e7a246-s502e0';
+
+    try {
+      final response =
+          await http.get(Uri.parse(url)).timeout(Duration(seconds: 20));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        if (data.containsKey('result')) {
+          return data['result'][toCurrency];
+        } else {
+          print('Conversion result not found in the response.');
+          return null;
+        }
+      } else {
+        print(
+            'Failed to convert currency. Status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error during currency conversion: $e');
+      return null;
+    }
   }
 
   void swapCurrencies() {

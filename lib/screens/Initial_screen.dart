@@ -87,7 +87,6 @@ class _InitialScreenState extends State<InitialScreen> {
                         selectedCurrency: dataClass.selectedToCurrency,
                         onChanged: (Currency? newValue) {
                           dataClass.selectedToCurrency = newValue!;
-                          print('Selected To Currency: ${newValue?.name}');
                         },
                         labelText: 'To',
                       ),

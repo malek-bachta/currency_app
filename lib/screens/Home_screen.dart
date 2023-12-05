@@ -1,4 +1,5 @@
 import 'package:currecy_App/models/Conversion.dart';
+import 'package:currecy_App/porviders/DataClass.dart';
 import 'package:currecy_App/screens/Archive_screen.dart';
 import 'package:currecy_App/screens/popups/Settings_popup.dart';
 import 'package:currecy_App/helpers/shared_preferences_helper.dart';
@@ -18,14 +19,23 @@ class _HomeScreenState extends State<HomeScreen> {
   late TextEditingController inputAmountController;
   late TextEditingController fromCurrencyController;
   late TextEditingController toCurrencyController;
+  late TextEditingController conversionResultController;
+
+  late TextEditingController inputUsernameController;
+
+  final dataClass = DataClass();
+  String conversionResult = '';
 
   @override
   void initState() {
     super.initState();
 
+    inputUsernameController = TextEditingController();
+
     inputAmountController = TextEditingController();
     fromCurrencyController = TextEditingController();
     toCurrencyController = TextEditingController();
+    conversionResultController = TextEditingController();
 
     loadSavedData();
   }
@@ -36,10 +46,14 @@ class _HomeScreenState extends State<HomeScreen> {
         await SharedPreferencesHelper.getConversionPreferences();
     final String? inputAmount = await SharedPreferencesHelper.getInputAmount();
 
+    final String? inputUsername = await SharedPreferencesHelper.getUsername();
+
     setState(() {
       inputAmountController.text = inputAmount ?? '';
       fromCurrencyController.text = conversionPreferences['fromCurrency'] ?? '';
       toCurrencyController.text = conversionPreferences['toCurrency'] ?? '';
+
+      inputUsernameController.text = inputUsername ?? '';
     });
   }
 
@@ -50,6 +64,37 @@ class _HomeScreenState extends State<HomeScreen> {
         return SettingsPopup();
       },
     );
+  }
+
+  void performConversion() async {
+    String fromCurrency = fromCurrencyController.text.toUpperCase();
+    String toCurrency = toCurrencyController.text.toUpperCase();
+
+    double amount = double.tryParse(inputAmountController.text) ?? 0.0;
+
+    double? result =
+        await dataClass.convertCurrency(fromCurrency, toCurrency, amount);
+
+    setState(() {
+      conversionResult =
+          result != null ? result.toString() : 'Error in conversion';
+      conversionResultController.text = conversionResult;
+
+      fromCurrencyController.text = fromCurrency;
+      toCurrencyController.text = toCurrency;
+    });
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      inputAmountController.clear();
+      fromCurrencyController.clear();
+      toCurrencyController.clear();
+
+      conversionResult = '';
+
+      loadSavedData();
+    });
   }
 
   @override
@@ -79,12 +124,14 @@ class _HomeScreenState extends State<HomeScreen> {
               Icons.archive,
               color: Colors.white,
             ),
-             onPressed: () {
+            onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ArchiveScreen(
-                    conversions: [staticConversion], // Add your list of conversions here
+                    conversions: [
+                      staticConversion
+                    ], // Add your list of conversions here
                   ),
                 ),
               );
@@ -101,137 +148,190 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 190.0,
-              height: 190.0,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFFECF0F1),
-              ),
-              child: Center(
-                child: Image.asset(
-                  'assets/images/currencylogo.png',
-                  width: 160.0,
-                  height: 160.0,
-                ),
-              ),
-            ),
-            SizedBox(height: 20.0),
-            Row(
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: SingleChildScrollView(
+          physics:
+              AlwaysScrollableScrollPhysics(), // Ensures that scrolling is always enabled
+
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: fromCurrencyController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'From',
-                      fillColor: const Color(0xFFECF0F1),
-                      filled: true,
-                      labelStyle: TextStyle(
-                        color: const Color(0xFF2C3E50),
-                      ),
+                Container(
+                  width: 190.0,
+                  height: 190.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFFECF0F1),
+                  ),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/currencylogo.png',
+                      width: 160.0,
+                      height: 160.0,
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(
-                    Icons.swap_horiz,
-                    color: const Color(0xFF2C3E50),
-                  ),
-                  onPressed: () {
-                    // Add logic for swapping 'From' and 'To'
-                  },
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: toCurrencyController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'To',
-                      fillColor: const Color(0xFFECF0F1),
-                      filled: true,
-                      labelStyle: TextStyle(
-                        color: const Color(0xFF2C3E50),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 20.0),
-            TextField(
-              controller: inputAmountController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Input Amount',
-                fillColor: const Color(0xFFECF0F1),
-                filled: true,
-                labelStyle: TextStyle(
-                  color: const Color(0xFF2C3E50),
-                ),
-              ),
-            ),
-            SizedBox(height: 20.0),
-            RichText(
-              text: TextSpan(
-                text: 'Result: ',
-                style: TextStyle(
-                  color: const Color(0xFF2C3E50),
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                children: [
-                  TextSpan(
-                    text: 'Your Result',
+                SizedBox(height: 20.0),
+                RichText(
+                  text: TextSpan(
+                    text: 'Username: ',
                     style: TextStyle(
-                      color: const Color(0xFF3498DB),
+                      color: const Color(0xFF2C3E50),
                       fontSize: 18.0,
-                      fontWeight: FontWeight.normal,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 20.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Add logic for currency conversion
-                  },
-                  child: Text(
-                    'Save',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    primary: const Color(0xFF3498DB),
+                    children: [
+                      TextSpan(
+                        text:
+                            '${inputUsernameController.text}', // Display the actual username
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 1, 112, 116),
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
+                SizedBox(height: 20.0),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: fromCurrencyController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'From',
+                          fillColor: const Color(0xFFECF0F1),
+                          filled: true,
+                          labelStyle: TextStyle(
+                            color: const Color(0xFF2C3E50),
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.swap_horiz,
+                        color: const Color(0xFF2C3E50),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          var temp = fromCurrencyController.text;
+                          fromCurrencyController.text =
+                              toCurrencyController.text;
+                          toCurrencyController.text = temp;
+                        });
+                      },
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: toCurrencyController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: 'To',
+                          fillColor: const Color(0xFFECF0F1),
+                          filled: true,
+                          labelStyle: TextStyle(
+                            color: const Color(0xFF2C3E50),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20.0),
+                TextField(
+                  controller: inputAmountController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Input Amount',
+                    fillColor: const Color(0xFFECF0F1),
+                    filled: true,
+                    labelStyle: TextStyle(
+                      color: const Color(0xFF2C3E50),
+                    ),
+                  ),
+                  keyboardType: TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                ),
+                SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () {
-                    // Add logic for discarding changes
+                    performConversion();
                   },
                   child: Text(
-                    'Discard',
+                    'convert',
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    primary: const Color(0xFFE74C3C),
+                    primary: Color.fromARGB(255, 11, 197, 36),
                   ),
+                ),
+                SizedBox(height: 20.0),
+                RichText(
+                  text: TextSpan(
+                    text: 'Result: ',
+                    style: TextStyle(
+                      color: const Color(0xFF2C3E50),
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: '$conversionResult',
+                        style: TextStyle(
+                          color: const Color(0xFF3498DB),
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        // Add logic for currency conversion
+                      },
+                      child: Text(
+                        'Save',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        primary: const Color(0xFF3498DB),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        _refreshData();
+                      },
+                      child: Text(
+                        'Discard',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        primary: const Color(0xFFE74C3C),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
