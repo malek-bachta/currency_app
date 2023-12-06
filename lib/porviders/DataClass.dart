@@ -15,11 +15,8 @@ class DataClass extends ChangeNotifier {
         'https://api.fastforex.io/currencies?api_key=38e8071029-c818e7a246-s502e0';
 
     try {
-      final response =
-          await http.get(Uri.parse(url)).timeout(Duration(seconds: 20));
+      final response = await http.get(Uri.parse(url));
       print('Response status code: ${response.statusCode}');
-
-      print('Raw response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -29,10 +26,7 @@ class DataClass extends ChangeNotifier {
           final Map<String, dynamic> currenciesData = data['currencies'];
 
           currencies = currenciesData.entries.map((entry) {
-            return Currency(
-              name: entry.value,
-              code: entry.key,
-            );
+            return Currency(name: entry.value, code: entry.key);
           }).toList();
 
           selectedFromCurrency ??= currencies.first;
@@ -44,18 +38,19 @@ class DataClass extends ChangeNotifier {
       } else {
         print(
             'Failed to fetch currencies. Status code: ${response.statusCode}');
-        print('Response body: ${response.body}');
+        // You can handle different status codes differently here
       }
     } catch (e) {
       if (e is TimeoutException) {
         print(
             'Timeout fetching currencies. Please check your internet connection.');
+      } else if (e is http.ClientException) {
+        print('Network error occurred: $e');
       } else {
-        print('Error fetching currencies: $e');
+        print('Unexpected error occurred: $e');
       }
     }
 
-    print('Currencies after fetch: $currencies');
     notifyListeners();
   }
 
@@ -102,7 +97,10 @@ class DataClass extends ChangeNotifier {
     notifyListeners();
   }
 
-   bool isCurrencyValid(String currencyCode) {
-    return currencies.any((currency) => currency.code == currencyCode);
+  bool isCurrencyValid(String currencyCode) {
+    String upperCaseCurrencyCode = currencyCode.toUpperCase();
+
+    return currencies.any(
+        (currency) => currency.code.toUpperCase() == upperCaseCurrencyCode);
   }
 }

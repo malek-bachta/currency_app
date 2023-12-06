@@ -26,6 +26,7 @@ class _SettingsPopupState extends State<SettingsPopup> {
     toCurrencyController = TextEditingController();
 
     loadSavedData();
+    dataClass.fetchCurrencies();
   }
 
   void loadSavedData() async {
@@ -63,20 +64,12 @@ class _SettingsPopupState extends State<SettingsPopup> {
   }
 
   bool validateInput() {
-    if (inputUsernameController.text.isEmpty ||
-        fromCurrencyController.text.isEmpty ||
-        toCurrencyController.text.isEmpty) {
+    if (fromCurrencyController.text.isEmpty ||
+        toCurrencyController.text.isEmpty ||
+        inputUsernameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Please fill all the fields"),
-        ),
-      );
-      return false;
-    }
-    if (fromCurrencyController.text == toCurrencyController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Please select different currencies"),
+          content: Text("Something is missing"),
         ),
       );
       return false;
@@ -85,7 +78,15 @@ class _SettingsPopupState extends State<SettingsPopup> {
         !dataClass.isCurrencyValid(toCurrencyController.text)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Please select valid currencies"),
+          content: Text("Invalid currency"),
+        ),
+      );
+      return false;
+    }
+    if (fromCurrencyController.text == toCurrencyController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select different currencies"),
         ),
       );
       return false;

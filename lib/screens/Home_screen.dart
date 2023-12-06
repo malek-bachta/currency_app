@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     conversionResultController = TextEditingController();
 
     loadSavedData();
+    dataClass.fetchCurrencies();
   }
 
   void loadSavedData() async {
