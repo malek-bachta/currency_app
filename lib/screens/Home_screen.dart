@@ -26,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    loadSavedData();
 
     inputUsernameController = TextEditingController();
 
@@ -34,7 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
     toCurrencyController = TextEditingController();
     conversionResultController = TextEditingController();
 
-    loadSavedData();
     dataClass.fetchCurrencies();
   }
 
@@ -107,6 +107,9 @@ class _HomeScreenState extends State<HomeScreen> {
         dateTime: DateTime.now(),
       );
       await SharedPreferencesHelper.saveConversionRecord(newConversion);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("conversion saved ! "),
+      ));
     }
   }
 

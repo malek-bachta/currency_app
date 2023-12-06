@@ -22,6 +22,52 @@ class _InitialScreenState extends State<InitialScreen> {
     Provider.of<DataClass>(context, listen: false).fetchCurrencies();
   }
 
+  void _saveData() async {
+    final String enteredUsername = usernameController.text;
+    final DataClass dataClass = Provider.of<DataClass>(context, listen: false);
+
+    if (enteredUsername.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please enter a username"),
+        ),
+      );
+    } else if (dataClass.selectedFromCurrency?.code ==
+        dataClass.selectedToCurrency?.code) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select different currencies"),
+        ),
+      );
+    } else {
+      final String enteredUsername = usernameController.text;
+      await SharedPreferencesHelper.saveUsername(enteredUsername);
+      print('Entered Username: $enteredUsername');
+
+      final String? username = await SharedPreferencesHelper.getUsername();
+      print('Username: $username');
+
+      final DataClass dataClass =
+          Provider.of<DataClass>(context, listen: false);
+      SharedPreferencesHelper.saveConversionPreferences(
+        dataClass.selectedFromCurrency?.code ?? 'USD',
+        dataClass.selectedToCurrency?.code ?? 'EUR',
+      );
+
+      final Map<String, String> conversionPreferences =
+          await SharedPreferencesHelper.getConversionPreferences();
+      print('From Currency: ${conversionPreferences['fromCurrency']}');
+      print('To Currency: ${conversionPreferences['toCurrency']}');
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,54 +143,8 @@ class _InitialScreenState extends State<InitialScreen> {
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: () async {
-                final String enteredUsername = usernameController.text;
-                final DataClass dataClass =
-                    Provider.of<DataClass>(context, listen: false);
-
-                if (enteredUsername.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Please enter a username"),
-                    ),
-                  );
-                } else if (dataClass.selectedFromCurrency?.code ==
-                    dataClass.selectedToCurrency?.code) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Please select different currencies"),
-                    ),
-                  );
-                } else {
-                  final String enteredUsername = usernameController.text;
-                  await SharedPreferencesHelper.saveUsername(enteredUsername);
-                  print('Entered Username: $enteredUsername');
-
-                  final String? username =
-                      await SharedPreferencesHelper.getUsername();
-                  print('Username: $username');
-
-                  // Save default conversion
-                  final DataClass dataClass =
-                      Provider.of<DataClass>(context, listen: false);
-                  SharedPreferencesHelper.saveConversionPreferences(
-                    dataClass.selectedFromCurrency?.code ?? 'USD',
-                    dataClass.selectedToCurrency?.code ?? 'EUR',
-                  );
-
-                  final Map<String, String> conversionPreferences =
-                      await SharedPreferencesHelper.getConversionPreferences();
-                  print(
-                      'From Currency: ${conversionPreferences['fromCurrency']}');
-                  print('To Currency: ${conversionPreferences['toCurrency']}');
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HomeScreen(),
-                    ),
-                  );
-                }
+              onPressed: () {
+                _saveData();
               },
               child: Text(
                 'Save',
