@@ -3,16 +3,24 @@ import 'package:currency_App/porviders/DataClass.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPopup extends StatefulWidget {
-  const SettingsPopup({Key? key}) : super(key: key);
+  final VoidCallback onPopupClosed; // Add this line
+
+  const SettingsPopup({Key? key, required this.onPopupClosed})
+      : super(key: key);
 
   @override
-  _SettingsPopupState createState() => _SettingsPopupState();
+  _SettingsPopupState createState() =>
+      _SettingsPopupState(onPopupClosed: onPopupClosed); // Update this line
 }
 
 class _SettingsPopupState extends State<SettingsPopup> {
   late TextEditingController inputUsernameController;
   late TextEditingController fromCurrencyController;
   late TextEditingController toCurrencyController;
+
+  final VoidCallback onPopupClosed;
+
+  _SettingsPopupState({required this.onPopupClosed});
 
   final dataClass = DataClass();
   String conversionResult = '';
@@ -172,12 +180,14 @@ class _SettingsPopupState extends State<SettingsPopup> {
                   children: [
                     TextButton(
                       child: Text("Cancel"),
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () =>
+                          {Navigator.of(context).pop(), onPopupClosed()},
                     ),
                     TextButton(
                       child: Text("Save", style: TextStyle(color: Colors.red)),
                       onPressed: () {
                         _UpdateData();
+                        onPopupClosed();
                       },
                     ),
                   ],

@@ -58,7 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return SettingsPopup();
+        return SettingsPopup(onPopupClosed: () {
+          _refreshData();
+        });
       },
     );
   }
@@ -83,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
         fromCurrencyController.text = fromCurrency;
         toCurrencyController.text = toCurrency;
       });
+      FocusScope.of(context).unfocus();
     } catch (e) {
       print("aaaaaaaaaaaa");
       setState(() {
@@ -115,13 +118,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _refreshData() async {
     setState(() {
+      loadSavedData();
       inputAmountController.clear();
       fromCurrencyController.clear();
       toCurrencyController.clear();
 
       conversionResult = '';
-
-      loadSavedData();
     });
   }
 
