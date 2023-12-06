@@ -29,7 +29,6 @@ class _SettingsPopupState extends State<SettingsPopup> {
   }
 
   void loadSavedData() async {
-    // Retrieve saved data from SharedPreferences
     final Map<String, String> conversionPreferences =
         await SharedPreferencesHelper.getConversionPreferences();
 
@@ -43,22 +42,34 @@ class _SettingsPopupState extends State<SettingsPopup> {
   }
 
   void _UpdateData() async {
-    // Retrieve values from the text controllers
-    String inputUsername = inputUsernameController.text;
-    String fromCurrency = fromCurrencyController.text.toUpperCase();
-    String toCurrency = toCurrencyController.text.toUpperCase();
+    try {
+      String inputUsername = inputUsernameController.text;
+      String fromCurrency = fromCurrencyController.text.toUpperCase();
+      String toCurrency = toCurrencyController.text.toUpperCase();
 
-    // Validate and save the inputUsername
-    if (inputUsername.isNotEmpty) {
-      await SharedPreferencesHelper.saveUsername(inputUsername);
+      if (!validateInput()) return;
+
+      if (inputUsername.isNotEmpty) {
+        await SharedPreferencesHelper.saveUsername(inputUsername);
+      }
+
+      await SharedPreferencesHelper.saveConversionPreferences(
+          fromCurrency, toCurrency);
+
+      Navigator.pop(context);
+    } catch (e) {
+      print("error");
     }
+  }
 
-    // Save the conversion preferences
-    await SharedPreferencesHelper.saveConversionPreferences(
-        fromCurrency, toCurrency);
-
-    // Close the settings popup
-    Navigator.pop(context);
+  bool validateInput() {
+    if (inputUsernameController.text.isEmpty ||
+        fromCurrencyController.text.isEmpty ||
+        toCurrencyController.text.isEmpty) {
+      print("something is empty");
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -144,7 +155,6 @@ class _SettingsPopupState extends State<SettingsPopup> {
                     TextButton(
                       child: Text("Save", style: TextStyle(color: Colors.red)),
                       onPressed: () {
-                        // Retrieve values from the text controllers
                         _UpdateData();
                       },
                     ),

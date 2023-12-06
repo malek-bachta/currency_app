@@ -1,7 +1,6 @@
 import 'package:currecy_App/screens/popups/ConversionDetails.dart';
 import 'package:flutter/material.dart';
 import 'package:currecy_App/models/Conversion.dart';
-import 'package:currecy_App/screens/popups/delete_confirmation.dart'; // Adjust the import path as needed
 
 class ConversionTile extends StatelessWidget {
   final Conversion conversion;
@@ -29,7 +28,7 @@ class ConversionTile extends StatelessWidget {
       child: ListTile(
         title: Text('From: ${conversion.from} To: ${conversion.to}'),
         subtitle: Text(
-            'Input: ${conversion.inputAmount}'), // Adjust the field name as per your Conversion model
+            'Input: ${conversion.inputAmount}'), 
         trailing: IconButton(
           icon: Icon(Icons.delete, color: Colors.red),
           onPressed: onDelete,

@@ -38,7 +38,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void loadSavedData() async {
-    // Retrieve saved data from SharedPreferences
     final Map<String, String> conversionPreferences =
         await SharedPreferencesHelper.getConversionPreferences();
     final String? inputAmount = await SharedPreferencesHelper.getInputAmount();
@@ -64,29 +63,45 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void performConversion() async {
+    try {
+      String fromCurrency = fromCurrencyController.text.toUpperCase();
+      String toCurrency = toCurrencyController.text.toUpperCase();
+
+      double amount = double.tryParse(inputAmountController.text) ?? 0.0;
+
+      // if (!validateInput()) return;
+
+      double? result =
+          await dataClass.convertCurrency(fromCurrency, toCurrency, amount);
+
+      setState(() {
+        conversionResult =
+            result != null ? result.toString() : 'Error in conversion';
+        conversionResultController.text = conversionResult;
+
+        fromCurrencyController.text = fromCurrency;
+        toCurrencyController.text = toCurrency;
+      });
+    } catch (e) {
+      print("aaaaaaaaaaaa");
+      setState(() {
+        conversionResult = 'Error: ${e.toString()}';
+      });
+    }
+  }
+
+  void SaveConversion() async {
     String fromCurrency = fromCurrencyController.text.toUpperCase();
     String toCurrency = toCurrencyController.text.toUpperCase();
-    String inputAmount = inputAmountController.text;
 
-    double amount = double.tryParse(inputAmountController.text) ?? 0.0;
-
+    double amount = double.tryParse(inputAmountController.text) ?? 0;
     double? result =
         await dataClass.convertCurrency(fromCurrency, toCurrency, amount);
-
-    setState(() {
-      conversionResult =
-          result != null ? result.toString() : 'Error in conversion';
-      conversionResultController.text = conversionResult;
-
-      fromCurrencyController.text = fromCurrency;
-      toCurrencyController.text = toCurrency;
-    });
-
     if (result != null) {
       Conversion newConversion = Conversion(
         from: fromCurrency,
         to: toCurrency,
-        inputAmount: inputAmount.toString(),
+        inputAmount: amount.toString(),
         result: result.toString(),
         dateTime: DateTime.now(),
       );
@@ -104,6 +119,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
       loadSavedData();
     });
+  }
+
+  bool validateInput() {
+    if (fromCurrencyController.text.isEmpty ||
+        toCurrencyController.text.isEmpty ||
+        inputAmountController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Something is missing"),
+        ),
+      );
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -134,11 +163,9 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white,
             ),
             onPressed: () async {
-              // Fetching conversion records from shared preferences
               List<Conversion> conversions =
                   await SharedPreferencesHelper.getConversionRecords();
 
-              // Navigating to the ArchiveScreen with the fetched conversions
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -161,9 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: SingleChildScrollView(
-          physics:
-              AlwaysScrollableScrollPhysics(), // Ensures that scrolling is always enabled
-
+          physics: AlwaysScrollableScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -195,8 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     children: [
                       TextSpan(
-                        text:
-                            '${inputUsernameController.text}', // Display the actual username
+                        text: '${inputUsernameController.text}',
                         style: TextStyle(
                           color: Color.fromARGB(255, 1, 112, 116),
                           fontSize: 18.0,
@@ -315,10 +339,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ElevatedButton(
-                      onPressed: () async {
-                        List<Conversion> conversions =
-                            await SharedPreferencesHelper
-                                .getConversionRecords();
+                      onPressed: () {
+                        SaveConversion();
                       },
                       child: Text(
                         'Save',

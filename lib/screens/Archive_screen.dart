@@ -32,7 +32,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
 
   void _handleDelete(int index) async {
     await SharedPreferencesHelper.deleteConversionRecord(index);
-    _loadConversions(); // Refresh the list after deletion
+    _loadConversions(); 
   }
 
   void _showDeleteConfirmation(BuildContext context, int index) {
@@ -48,7 +48,7 @@ class _ArchiveScreenState extends State<ArchiveScreen> {
 
   void _confirmDelete(int index) async {
     await SharedPreferencesHelper.deleteConversionRecord(index);
-    _loadConversions(); // Refresh the list after deletion
+    _loadConversions(); 
   }
 
   @override

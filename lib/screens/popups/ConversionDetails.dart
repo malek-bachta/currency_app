@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:currecy_App/models/Conversion.dart'; // Import the Conversion model
+import 'package:currecy_App/models/Conversion.dart'; 
 
 class ConversionDetails extends StatelessWidget {
   final Conversion conversion;

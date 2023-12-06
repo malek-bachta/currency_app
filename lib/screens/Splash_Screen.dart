@@ -61,8 +61,8 @@ class _SplashScreenState extends State<SplashScreen>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF2E86C1), // Deep Sky Blue
-              Color(0xFF3498DB), // Dodger Blue
+              Color(0xFF2E86C1), 
+              Color(0xFF3498DB),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
