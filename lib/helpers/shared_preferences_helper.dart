@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:currecy_App/models/Conversion.dart';
+import 'package:currency_App/models/Conversion.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesHelper {

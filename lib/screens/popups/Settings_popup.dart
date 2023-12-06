@@ -1,5 +1,5 @@
-import 'package:currecy_App/helpers/shared_preferences_helper.dart';
-import 'package:currecy_App/porviders/DataClass.dart';
+import 'package:currency_App/helpers/shared_preferences_helper.dart';
+import 'package:currency_App/porviders/DataClass.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPopup extends StatefulWidget {
@@ -66,7 +66,28 @@ class _SettingsPopupState extends State<SettingsPopup> {
     if (inputUsernameController.text.isEmpty ||
         fromCurrencyController.text.isEmpty ||
         toCurrencyController.text.isEmpty) {
-      print("something is empty");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please fill all the fields"),
+        ),
+      );
+      return false;
+    }
+    if (fromCurrencyController.text == toCurrencyController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select different currencies"),
+        ),
+      );
+      return false;
+    }
+    if (!dataClass.isCurrencyValid(fromCurrencyController.text) ||
+        !dataClass.isCurrencyValid(toCurrencyController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select valid currencies"),
+        ),
+      );
       return false;
     }
     return true;

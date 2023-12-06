@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:currecy_App/models/Conversion.dart'; 
+import 'package:currency_App/models/Conversion.dart';
+import 'package:intl/intl.dart';
 
 class ConversionDetails extends StatelessWidget {
   final Conversion conversion;
@@ -9,6 +10,9 @@ class ConversionDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formattedDate =
+        DateFormat('HH:mm:ss dd/MM/yyyy').format(conversion.dateTime);
+
     return AlertDialog(
       title: Text('Conversion Details'),
       content: SingleChildScrollView(
@@ -18,7 +22,7 @@ class ConversionDetails extends StatelessWidget {
             Text('To: ${conversion.to}'),
             Text('Input: ${conversion.inputAmount}'),
             Text('Result: ${conversion.result}'),
-            Text('Date: ${conversion.dateTime.toLocal().toString()}')
+            Text('Date: ${formattedDate}')
           ],
         ),
       ),

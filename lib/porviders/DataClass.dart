@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:currecy_App/models/Currency.dart';
+import 'package:currency_App/models/Currency.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
@@ -100,5 +100,9 @@ class DataClass extends ChangeNotifier {
     selectedToCurrency = temp;
 
     notifyListeners();
+  }
+
+   bool isCurrencyValid(String currencyCode) {
+    return currencies.any((currency) => currency.code == currencyCode);
   }
 }

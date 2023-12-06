@@ -1,8 +1,8 @@
-import 'package:currecy_App/helpers/shared_preferences_helper.dart';
-import 'package:currecy_App/screens/popups/delete_confirmation.dart';
-import 'package:currecy_App/screens/widgets/ConversionTile.dart';
+import 'package:currency_App/helpers/shared_preferences_helper.dart';
+import 'package:currency_App/screens/popups/delete_confirmation.dart';
+import 'package:currency_App/screens/widgets/ConversionTile.dart';
 import 'package:flutter/material.dart';
-import 'package:currecy_App/models/Conversion.dart';
+import 'package:currency_App/models/Conversion.dart';
 
 class ArchiveScreen extends StatefulWidget {
   final List<Conversion> conversions;

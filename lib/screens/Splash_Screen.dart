@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:currecy_App/screens/Home_screen.dart';
-import 'package:currecy_App/screens/Initial_screen.dart';
-import 'package:currecy_App/helpers/shared_preferences_helper.dart';
+import 'package:currency_App/screens/Home_screen.dart';
+import 'package:currency_App/screens/Initial_screen.dart';
+import 'package:currency_App/helpers/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -61,8 +61,8 @@ class _SplashScreenState extends State<SplashScreen>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF2E86C1), 
-              Color(0xFF3498DB),
+              Color.fromRGBO(100, 134, 142, 0.31),
+              Color.fromRGBO(79, 109, 122, 0.35),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,

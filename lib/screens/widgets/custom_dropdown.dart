@@ -1,4 +1,4 @@
-import 'package:currecy_App/models/Currency.dart';
+import 'package:currency_App/models/Currency.dart';
 import 'package:flutter/material.dart';
 
 class CustomDropdown extends StatelessWidget {

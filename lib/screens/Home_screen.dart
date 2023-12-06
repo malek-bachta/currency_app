@@ -1,8 +1,8 @@
-import 'package:currecy_App/models/Conversion.dart';
-import 'package:currecy_App/porviders/DataClass.dart';
-import 'package:currecy_App/screens/Archive_screen.dart';
-import 'package:currecy_App/screens/popups/Settings_popup.dart';
-import 'package:currecy_App/helpers/shared_preferences_helper.dart';
+import 'package:currency_App/models/Conversion.dart';
+import 'package:currency_App/porviders/DataClass.dart';
+import 'package:currency_App/screens/Archive_screen.dart';
+import 'package:currency_App/screens/popups/Settings_popup.dart';
+import 'package:currency_App/helpers/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       double amount = double.tryParse(inputAmountController.text) ?? 0.0;
 
-      // if (!validateInput()) return;
+      if (!validateInput()) return;
 
       double? result =
           await dataClass.convertCurrency(fromCurrency, toCurrency, amount);
@@ -128,6 +128,23 @@ class _HomeScreenState extends State<HomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Something is missing"),
+        ),
+      );
+      return false;
+    }
+    if (!dataClass.isCurrencyValid(fromCurrencyController.text) ||
+        !dataClass.isCurrencyValid(toCurrencyController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Invalid currency"),
+        ),
+      );
+      return false;
+    }
+    if (fromCurrencyController.text == toCurrencyController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select different currencies"),
         ),
       );
       return false;

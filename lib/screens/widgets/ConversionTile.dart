@@ -1,6 +1,7 @@
-import 'package:currecy_App/screens/popups/ConversionDetails.dart';
+import 'package:currency_App/screens/popups/ConversionDetails.dart';
 import 'package:flutter/material.dart';
-import 'package:currecy_App/models/Conversion.dart';
+import 'package:currency_App/models/Conversion.dart';
+import 'package:intl/intl.dart';
 
 class ConversionTile extends StatelessWidget {
   final Conversion conversion;
@@ -23,12 +24,13 @@ class ConversionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final formattedDate = DateFormat('HH:mm:ss').format(conversion.dateTime);
+
     return Card(
       margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 16),
       child: ListTile(
         title: Text('From: ${conversion.from} To: ${conversion.to}'),
-        subtitle: Text(
-            'Input: ${conversion.inputAmount}'), 
+        subtitle: Text('Date: ${formattedDate}'),
         trailing: IconButton(
           icon: Icon(Icons.delete, color: Colors.red),
           onPressed: onDelete,
