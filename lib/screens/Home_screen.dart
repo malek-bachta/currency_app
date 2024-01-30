@@ -4,6 +4,7 @@ import 'package:currency_App/screens/Archive_screen.dart';
 import 'package:currency_App/screens/popups/Settings_popup.dart';
 import 'package:currency_App/helpers/shared_preferences_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key});
@@ -98,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String fromCurrency = fromCurrencyController.text.toUpperCase();
     String toCurrency = toCurrencyController.text.toUpperCase();
 
-    double amount = double.tryParse(inputAmountController.text) ?? 0;
+    double amount = double.tryParse(inputAmountController.text) ?? 0.0;
     double? result =
         await dataClass.convertCurrency(fromCurrency, toCurrency, amount);
     if (result != null) {
@@ -208,193 +209,197 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _refreshData,
-        child: SingleChildScrollView(
-          physics: AlwaysScrollableScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 190.0,
-                  height: 190.0,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFFECF0F1),
-                  ),
-                  child: Center(
-                    child: Image.asset(
-                      'assets/images/currencylogo.png',
-                      width: 160.0,
-                      height: 160.0,
+      body: Consumer<DataClass>(
+        builder: (context, dataClass, child) {
+          return RefreshIndicator(
+            onRefresh: _refreshData,
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 190.0,
+                      height: 190.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: const Color(0xFFECF0F1),
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          'assets/images/currencylogo.png',
+                          width: 160.0,
+                          height: 160.0,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(height: 20.0),
-                RichText(
-                  text: TextSpan(
-                    text: 'Username: ',
-                    style: TextStyle(
-                      color: const Color(0xFF2C3E50),
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    children: [
-                      TextSpan(
-                        text: '${inputUsernameController.text}',
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 1, 112, 116),
+                    SizedBox(height: 20.0),
+                    RichText(
+                      text: TextSpan(
+                        text: 'Username: ',
+                        style: const TextStyle(
+                          color: const Color(0xFF2C3E50),
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold,
                         ),
+                        children: [
+                          TextSpan(
+                            text: '${inputUsernameController.text}',
+                            style: const TextStyle(
+                              color: Color.fromARGB(255, 1, 112, 116),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20.0),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: fromCurrencyController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'From',
-                          fillColor: const Color(0xFFECF0F1),
-                          filled: true,
-                          labelStyle: TextStyle(
-                            color: const Color(0xFF2C3E50),
+                    ),
+                    SizedBox(height: 20.0),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: fromCurrencyController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'From',
+                              fillColor: const Color(0xFFECF0F1),
+                              filled: true,
+                              labelStyle: TextStyle(
+                                color: const Color(0xFF2C3E50),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.swap_horiz,
-                        color: const Color(0xFF2C3E50),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          var temp = fromCurrencyController.text;
-                          fromCurrencyController.text =
-                              toCurrencyController.text;
-                          toCurrencyController.text = temp;
-                        });
-                      },
-                    ),
-                    Expanded(
-                      child: TextField(
-                        controller: toCurrencyController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: 'To',
-                          fillColor: const Color(0xFFECF0F1),
-                          filled: true,
-                          labelStyle: TextStyle(
+                        IconButton(
+                          icon: const Icon(
+                            Icons.swap_horiz,
                             color: const Color(0xFF2C3E50),
                           ),
+                          onPressed: () {
+                            setState(() {
+                              var temp = fromCurrencyController.text;
+                              fromCurrencyController.text =
+                                  toCurrencyController.text;
+                              toCurrencyController.text = temp;
+                            });
+                          },
+                        ),
+                        Expanded(
+                          child: TextField(
+                            controller: toCurrencyController,
+                            decoration: const InputDecoration(
+                              border: OutlineInputBorder(),
+                              labelText: 'To',
+                              fillColor: Color(0xFFECF0F1),
+                              filled: true,
+                              labelStyle: TextStyle(
+                                color: Color(0xFF2C3E50),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20.0),
+                    TextField(
+                      controller: inputAmountController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Input Amount',
+                        fillColor: const Color(0xFFECF0F1),
+                        filled: true,
+                        labelStyle: TextStyle(
+                          color: const Color(0xFF2C3E50),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20.0),
-                TextField(
-                  controller: inputAmountController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Input Amount',
-                    fillColor: const Color(0xFFECF0F1),
-                    filled: true,
-                    labelStyle: TextStyle(
-                      color: const Color(0xFF2C3E50),
-                    ),
-                  ),
-                  keyboardType: TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                ),
-                SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: () {
-                    performConversion();
-                  },
-                  child: Text(
-                    'convert',
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    primary: Color.fromARGB(255, 11, 197, 36),
-                  ),
-                ),
-                SizedBox(height: 20.0),
-                Container(
-                  padding: EdgeInsets.all(15.0),
-                  decoration: BoxDecoration(
-                    color: Color.fromARGB(255, 232, 245, 233),
-                    borderRadius: BorderRadius.circular(10),
-                    border:
-                        Border.all(color: Color.fromARGB(255, 200, 230, 201)),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.compare_arrows,
-                          color: Color.fromARGB(255, 11, 197, 36)),
-                      SizedBox(width: 10),
-                      Text(
-                        'Result: $conversionResult',
-                        style: TextStyle(
-                          color: Color.fromARGB(255, 30, 42, 42),
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      keyboardType: TextInputType.numberWithOptions(
+                        decimal: true,
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20.0),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
+                    ),
+                    SizedBox(height: 20.0),
                     ElevatedButton(
                       onPressed: () {
-                        SaveConversion();
+                        performConversion();
                       },
                       child: Text(
-                        'Save',
+                        'convert',
                         style: TextStyle(
                           color: Colors.white,
                         ),
                       ),
                       style: ElevatedButton.styleFrom(
-                        primary: const Color(0xFF3498DB),
+                        primary: Color.fromARGB(255, 11, 197, 36),
                       ),
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        _refreshData();
-                      },
-                      child: Text(
-                        'Discard',
-                        style: TextStyle(
-                          color: Colors.white,
+                    SizedBox(height: 20.0),
+                    Container(
+                      padding: EdgeInsets.all(15.0),
+                      decoration: BoxDecoration(
+                        color: Color.fromARGB(255, 232, 245, 233),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: Color.fromARGB(255, 200, 230, 201)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.compare_arrows,
+                              color: Color.fromARGB(255, 11, 197, 36)),
+                          SizedBox(width: 10),
+                          Text(
+                            'Result: $conversionResult',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 30, 42, 42),
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            SaveConversion();
+                          },
+                          child: Text(
+                            'Save',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            primary: const Color(0xFF3498DB),
+                          ),
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        primary: const Color(0xFFE74C3C),
-                      ),
+                        ElevatedButton(
+                          onPressed: () {
+                            _refreshData();
+                          },
+                          child: Text(
+                            'Discard',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            primary: const Color(0xFFE74C3C),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

@@ -3,14 +3,14 @@ import 'package:currency_App/porviders/DataClass.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPopup extends StatefulWidget {
-  final VoidCallback onPopupClosed; // Add this line
+  final VoidCallback onPopupClosed; 
 
   const SettingsPopup({Key? key, required this.onPopupClosed})
       : super(key: key);
 
   @override
   _SettingsPopupState createState() =>
-      _SettingsPopupState(onPopupClosed: onPopupClosed); // Update this line
+      _SettingsPopupState(onPopupClosed: onPopupClosed); 
 }
 
 class _SettingsPopupState extends State<SettingsPopup> {

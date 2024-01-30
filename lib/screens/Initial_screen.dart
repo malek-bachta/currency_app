@@ -13,6 +13,7 @@ class InitialScreen extends StatefulWidget {
   _InitialScreenState createState() => _InitialScreenState();
 }
 
+
 class _InitialScreenState extends State<InitialScreen> {
   TextEditingController usernameController = TextEditingController();
 
@@ -94,10 +95,10 @@ class _InitialScreenState extends State<InitialScreen> {
             SizedBox(height: 20.0),
             TextField(
               controller: usernameController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Username',
-                fillColor: const Color(0xFFECF0F1),
+                fillColor: Color(0xFFECF0F1),
                 filled: true,
               ),
             ),

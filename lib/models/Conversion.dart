@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+
+@immutable
 class Conversion {
   final String inputAmount;
   final String from;
